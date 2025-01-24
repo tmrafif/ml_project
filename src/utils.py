@@ -4,6 +4,7 @@ import sys
 import dill
 import numpy as np
 import pandas as pd
+from sklearn.metrics import r2_score
 
 from pathlib import Path
 sys.path.append(str(Path(__file__).parent))
@@ -30,3 +31,40 @@ def save_object(file_path: str, obj: object) -> None:
 
     except Exception as e:
         raise CustomException(e, sys)
+    
+def evaluate_models(X_train, y_train, X_test, y_test, models: dict) -> dict:
+    """
+    Evaluates the performance of multiple regression models on training and test data using the R-squared metric.
+
+    Parameters:
+    X_train (array-like): The training data features.
+    y_train (array-like): The training data target.
+    X_test (array-like): The test data features.
+    y_test (array-like): The test data target.
+    models (dict): A dictionary of model names and their corresponding model objects.
+
+    Returns:
+    dict: A dictionary containing the R-squared scores for each model on the test data.
+
+    Raises:
+    CustomException: If an exception occurs during evaluation.
+    """
+    try:
+        report = {}
+        for model_name, model in models.items():
+            model.fit(X_train, y_train)
+
+            y_train_pred = model.predict(X_train)
+            y_test_pred = model.predict(X_test)
+
+            train_score = r2_score(y_train, y_train_pred)
+            test_score = r2_score(y_test, y_test_pred)
+
+            report[model_name] = test_score
+
+        return report
+
+    except Exception as e:
+        raise CustomException(e, sys)
+
+    
