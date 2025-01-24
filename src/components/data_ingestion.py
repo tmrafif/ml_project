@@ -9,6 +9,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent))
 from exception import CustomException
 from logger import logging
+from data_transformation import DataTransformation, DataTransformationConfig
 
 @dataclass
 class DataIngestionConfig:
@@ -21,6 +22,14 @@ class DataIngestion:
         self.ingestion_config = DataIngestionConfig()
 
     def initiate_data_ingestion(self):
+        """
+        This function is responsible for ingesting the data from the given csv file
+        and splitting it into train and test datasets. It also creates a raw_data csv
+        which contains the entire dataset without any splitting.
+        
+        Returns:
+            tuple: A tuple containing the paths of the train and test datasets.
+        """
         logging.info('Data Ingestion methods Starts')
         try:
             logging.info('Read dataset as dataframe')
@@ -60,4 +69,7 @@ class DataIngestion:
         
 if __name__ == "__main__":
     obj = DataIngestion()
-    obj.initiate_data_ingestion()
+    train_path, test_path = obj.initiate_data_ingestion()
+
+    data_transformation = DataTransformation()
+    data_transformation.initiate_data_transformation(train_path, test_path)
